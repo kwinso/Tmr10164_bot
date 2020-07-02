@@ -93,7 +93,7 @@ async function startBot() {
 
 startBot()
 
-app.get('/', (req, res) => {
-    res.send("Server for nice bot")
-})
-app.listen(3000)
+// app.get('/', (req, res) => {
+//     res.send("Server for nice bot")
+// })
+// app.listen( 3000)
