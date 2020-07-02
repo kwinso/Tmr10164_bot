@@ -1,0 +1,25 @@
+{
+  "name": "how_much_programmer_bot",
+  "version": "1.0.0",
+  "description": "Bot inspired by @HowGayBot but for programmers ",
+  "main": "bot.js",
+  "scripts": {
+    "dev": "nodemon bot.js"
+  },
+  "keywords": [
+    "bot",
+    "telegram",
+    "programming"
+  ],
+  "author": "Ruslan Umouse <pythonisajoke@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.9.21",
+    "random": "^2.2.0",
+    "telegraf": "^3.38.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
