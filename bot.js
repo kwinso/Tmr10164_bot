@@ -6,35 +6,10 @@ const { Telegraf, mount, filter } = require('telegraf');
 const Markup = require('telegraf/markup');
 const mongoose = require("mongoose");
 const Voice = require('./models/Voice.js');
+const express = require("express");
+const app = express();
 
 
-const  commands = [
-    "beach",
-    "between", 
-    "boy", 
-    "do_not_hack",
-    "good_language",
-    "good_code",
-    "grammar",
-    "hacking",
-    "info",
-    "it_lesson",
-    "joke",
-    "same",
-    "tanks",
-    "tired",
-    "time",
-    "true_lang",
-    "truth",
-    "who",
-    "biology",
-    "database",
-    "marketing_advice",
-    "recursion",
-    "song",
-    "mamix",
-    "arabian"
-] 
 
 
 const dropOldUpdates = mount('message', ({ message }, next) => {
@@ -105,9 +80,7 @@ function connectToDB() {
     db.on("error", (e) => console.error("Error occured while connecting to database:\n" + e));
 }
 
-for (let command of commands) {
-    bot.command(command, ctx => ctx.replyWithVoice({ source: `./assets/${command}.ogg`}))
-}
+
 async function startBot() {
     try {
         await bot.launch()
@@ -119,3 +92,8 @@ async function startBot() {
 }
 
 startBot()
+
+app.get('/', (req, res) => {
+    res.send("Server for nice bot")
+})
+app.listen(3000)
