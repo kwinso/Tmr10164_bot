@@ -62,19 +62,6 @@ bot.use(dropOldUpdates)
 bot.use(dropOldUpdatesAlternate)
 bot.use(dropOldUpdatesModern)
 
-bot.hears(/паяльник/gi, ctx => {
-    const random = Math.floor(Math.random() * 100) + 1;
-    if (random > 85)
-        return ctx.replyWithVoice({ source: "./assets/tired" });
-});
-bot.hears(/^Спой песню/i, (ctx) => {
-    return ctx.replyWithVoice({ source : "./assets/song.ogg"});
-});
-bot.hears(/^Скажи на арабском/i, (ctx) => {
-    return ctx.replyWithVoice({ source: "./assets/arabian.ogg"});
-})
-
-
 
 bot.on("inline_query", async ({ inlineQuery, answerInlineQuery }) => {
     try {
@@ -102,7 +89,7 @@ bot.on("inline_query", async ({ inlineQuery, answerInlineQuery }) => {
                 message_text: `У меня ${programmer} паяльник(-ов)!`
             }
         })
-        return answerInlineQuery(repsonse, { cache_time: 3})
+        return answerInlineQuery(repsonse, { cache_time: 10})
     } catch (e) {
         console.log(e);
     }
@@ -122,9 +109,13 @@ for (let command of commands) {
     bot.command(command, ctx => ctx.replyWithVoice({ source: `./assets/${command}.ogg`}))
 }
 async function startBot() {
-    await bot.launch()
-    connectToDB();
-    console.log("Bot started");
+    try {
+        await bot.launch()
+        connectToDB();
+        console.log("Bot started");
+    } catch (e) {
+        console.log(e);        
+    }
 }
 
 startBot()
