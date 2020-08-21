@@ -2,40 +2,18 @@ if (process.env.NODE_ENV !== "production") {
     require('dotenv').config();
 }
 
-const { Telegraf, mount, filter } = require('telegraf');
+const { Telegraf, filter } = require('telegraf');
 const Markup = require('telegraf/markup');
 const mongoose = require("mongoose");
 const Voice = require('./models/Voice.js');
-const express = require("express");
-const app = express();
 
-
-
-
-const dropOldUpdates = mount('message', ({ message }, next) => {
-  const now = new Date().getTime() / 1000
-  if (message.date > (now - 60 * 2)) {
-    return next()
-  }
-})
-
-const dropOldUpdatesAlternate = ({ message }, next) => {
-  const now = new Date().getTime() / 1000
-  if (!message || message.date > (now - 60 * 2)) {
-    return next()
-  }
-}
-
-// Using `filter` factory, telegraf 3.7.3 is required 
 const dropOldUpdatesModern = filter(({ message }) => {
-  const now = new Date().getTime() / 1000
-  return !message || message.date > (now - 60 * 2)
-})
+  const now = new Date().getTime() / 1000;
+  return !message || message.date > (now - 60 * 2);
+});
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
-bot.use(dropOldUpdates)
-bot.use(dropOldUpdatesAlternate)
-bot.use(dropOldUpdatesModern)
+bot.use(dropOldUpdatesModern);
 
 
 bot.on("inline_query", async ({ inlineQuery, answerInlineQuery }) => {
@@ -76,24 +54,13 @@ function connectToDB() {
         useNewUrlParser: true
     });
     const db = mongoose.connection;
-    db.on("open", () => console.log("Connectted to database " + db.name));
-    db.on("error", (e) => console.error("Error occured while connecting to database:\n" + e));
+    db.on("open", () => console.log("Connected to database " + db.name));
+    db.on("error", (e) => console.error("Error occurred while connecting to database:\n" + e));
 }
 
-
-async function startBot() {
-    try {
-        await bot.launch()
-        connectToDB();
-        console.log("Bot started");
-    } catch (e) {
-        console.log(e);        
-    }
-}
-
-startBot()
-
-// app.get('/', (req, res) => {
-//     res.send("Server for nice bot")
-// })
-// app.listen( 3000)
+bot.launch().then(() => {
+    console.log("Connecting to database");
+    connectToDB()
+    console.log("MongoDB connected.");
+    console.log("Bot started");
+});
