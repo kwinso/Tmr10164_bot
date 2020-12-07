@@ -8,7 +8,7 @@ const dropOldUpdatesModern = filter(({ message }) => {
   return !message || message.date > (now - 60 * 2);
 });
 
-const BOT_TOKEN = "1346820594:AAHV3h3g_z_EwttsKFR8toU1_4ZrMco8KwA"
+const BOT_TOKEN = "<блять ненавижу токены палить сука>"
 
 const bot = new Telegraf(BOT_TOKEN);
 bot.use(dropOldUpdatesModern);
