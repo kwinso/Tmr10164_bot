@@ -1,28 +1,36 @@
-if (process.env.NODE_ENV !== "production") {
-    require('dotenv').config();
-}
-
+const fs = require("fs");
+const path = require("path");
 const { Telegraf, filter } = require('telegraf');
 const Markup = require('telegraf/markup');
-const mongoose = require("mongoose");
-const Voice = require('./models/Voice.js');
 
 const dropOldUpdatesModern = filter(({ message }) => {
   const now = new Date().getTime() / 1000;
   return !message || message.date > (now - 60 * 2);
 });
 
-const bot = new Telegraf(process.env.BOT_TOKEN);
+const BOT_TOKEN = "1346820594:AAHV3h3g_z_EwttsKFR8toU1_4ZrMco8KwA"
+
+const bot = new Telegraf(BOT_TOKEN);
 bot.use(dropOldUpdatesModern);
 
+let voices; 
+
+async function loadVoices() {
+    const jsonVoices = await fs.readFileSync(path.join(__dirname, "timur.json"));
+    voices = JSON.parse(jsonVoices);
+} 
 
 bot.on("inline_query", async ({ inlineQuery, answerInlineQuery }) => {
     try {
                 
         const programmer = Math.floor(Math.random() * 100) + 1;
-        const dbquery = inlineQuery.query.trim() ? { tags: { $all: inlineQuery.query.toLowerCase().trim().split(' ')}} : {};
-        const voices = await Voice.find(dbquery).limit(35);
-        const repsonse = voices.map((v, index) => {
+        let foundVoices;
+        if (inlineQuery.query.trim()) {
+            foundVoices = voices.filter(v => v.tags.includes(inlineQuery.query.trim()));
+        } else {
+            foundVoices = voices;
+        } 
+        const repsonse = foundVoices.map((v, index) => {
             return {
                 type: "voice", 
                 id: index + 2,
@@ -48,19 +56,10 @@ bot.on("inline_query", async ({ inlineQuery, answerInlineQuery }) => {
     }
 });
 
-function connectToDB() {
-    mongoose.connect(process.env.MONGODB_URI, {
-        useUnifiedTopology: true,
-        useNewUrlParser: true
-    });
-    const db = mongoose.connection;
-    db.on("open", () => console.log("Connected to database " + db.name));
-    db.on("error", (e) => console.error("Error occurred while connecting to database:\n" + e));
+async function startBot() {
+    await loadVoices();
+    await bot.launch();
+    console.log("Bot started");
 }
 
-bot.launch().then(() => {
-    console.log("Connecting to database");
-    connectToDB()
-    console.log("MongoDB connected.");
-    console.log("Bot started");
-});
+startBot();
