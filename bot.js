@@ -8,9 +8,9 @@ const dropOldUpdatesModern = filter(({ message }) => {
   return !message || message.date > (now - 60 * 2);
 });
 
-const BOT_TOKEN = "token"
+require("dotenv").config();
 
-const bot = new Telegraf(BOT_TOKEN);
+const bot = new Telegraf(process.env.BOT_TOKEN);
 bot.use(dropOldUpdatesModern);
 
 let voices; 
