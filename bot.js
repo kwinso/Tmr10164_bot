@@ -20,25 +20,54 @@ async function loadVoices() {
     voices = JSON.parse(jsonVoices);
 }
 
+function getNumberNoun(n) {
+    const forms = ["паяльник", "паяльника", "паяльников"]
+    n = Math.abs(n) % 100; const n1 = n % 10;
+    if (n > 10 && n < 20) { return forms[2]; }
+    if (n1 > 1 && n1 < 5) { return forms[1]; }
+    if (n1 == 1) { return forms[0]; }
+    return forms[2];
+}
+
 bot.on("inline_query", async ({ inlineQuery, answerInlineQuery }) => {
     try {
-
         const programmer = Math.floor(Math.random() * 100) + 1;
         const query = inlineQuery.query.trim();
-        let foundVoices;
+        let foundVoices = [];
+        
         if (query) {
-            foundVoices = voices.filter(v => v.tags.includes(query));
+            voices.forEach(v => {
+                v.tags.forEach(tag => { 
+                    if (tag.toLowerCase().indexOf(query.toLowerCase()) > -1) foundVoices.push(v);
+                });
+            });
         } else {
             foundVoices = voices;
         }
         const repsonse = foundVoices.map((v, index) => {
             return {
                 type: "voice",
-                id: index + 2,
+                id: index + 3,
                 title: v.title,
                 voice_url: v.voice_url
             }
         });
+
+        if (query) {
+            repsonse.unshift({
+                type: "article",
+                id: 2,
+                title: `Обращение к анимешнику ${query}`,
+                thumb_url: "https://i.ibb.co/3dkm2wk/tmr-pic.jpg",
+                reply_markup: Markup.inlineKeyboard([
+                    Markup.switchToCurrentChatButton(`Отправь такой совет знакомому анимешнику. Быстро!`, '')
+                ]),
+                input_message_content: {
+                    message_text: `Чел, ${query}, ты, блять, не Кира. Ты просто, блять, не этот... Понимаешь, ты просто, блять, этот... Ты просто анимешник, которому нехуй делать. Найди себе, блять, тянку. Только найди, блять, нормальную, чтобы, нахуй.. Блять,  у тебя всё было заебись с ней, блять, типа... Она, блять, по хате там убиралась, вся такая хуйня, блять. И тебе будет нормально всё, блять. Хватит быть ёбанным анимешником.`
+                }
+            })
+        }
+
         repsonse.unshift({
             type: "article",
             id: 1,
@@ -48,9 +77,10 @@ bot.on("inline_query", async ({ inlineQuery, answerInlineQuery }) => {
                 Markup.switchToCurrentChatButton("Поделиться своим уровнем программирования", '')
             ]),
             input_message_content: {
-                message_text: query ? `У ${query} есть ${programmer} паяльник(-ов)!` : `У меня ${programmer} паяльник(-ов)!`
+                message_text: query ? `У ${query} есть ${programmer} ${getNumberNoun(programmer)}!` : `У меня ${programmer} ${getNumberNoun(programmer)}!`
             }
-        })
+        });
+        
         return answerInlineQuery(repsonse, { cache_time: 10 })
     } catch (e) {
         console.log(e);
